@@ -22,6 +22,16 @@ double dt = 0;
 // This is the length from front to CoG that has a similar radius.
 const double Lf = 2.67;
 
+// Save indices where each variable starts
+size_t x_start = 0;
+size_t y_start = x_start + N;
+size_t psi_start = y_start + N;
+size_t v_start = psi_start + N;
+size_t cte_start = v_start + N;
+size_t epsi_start = cte_start + N;
+size_t delta_start = epsi_start + N;
+size_t a_start = delta_start + N;
+
 class FG_eval {
  public:
   // Fitted polynomial coefficients
@@ -48,14 +58,23 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   size_t i;
   typedef CPPAD_TESTVECTOR(double) Dvector;
 
+
+  // Initial state variables
+  double x = state[0];
+  double y = state[1];
+  double psi = state[2];
+  double v = state[3];
+  double cte = state[4];
+  double epsi = state[5];
+
   // TODO: Set the number of model variables (includes both states and inputs).
   // For example: If the state is a 4 element vector, the actuators is a 2
   // element vector and there are 10 timesteps. The number of variables is:
   //
   // 4 * 10 + 2 * 9
-  size_t n_vars = 0;
+  size_t n_vars = 6*N + 2*(N-1);
   // TODO: Set the number of constraints
-  size_t n_constraints = 0;
+  size_t n_constraints = 6*N;
 
   // Initial value of the independent variables.
   // SHOULD BE 0 besides initial state.
@@ -64,9 +83,37 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
     vars[i] = 0;
   }
 
+  // Set initial values to inital state
+  vars[x_start] = x;
+  vars[y_start] = y;
+  vars[psi_start] = psi;
+  vars[v_start] = v;
+  vars[cte_start] = cte;
+  vars[epsi_start] = epsi;
+
+  // TODO: Set lower and upper limits for variables.
   Dvector vars_lowerbound(n_vars);
   Dvector vars_upperbound(n_vars);
-  // TODO: Set lower and upper limits for variables.
+  
+  // Non-actuator values can be anything so set the bounds to max values
+  for (unsigned int i=0; i < delta_start; i++) {
+  	vars_lowerbound[i] = -1.0e19;
+	vars_upperbound[i] = 1.0e19;
+  }
+
+  // set delta bounds to -25 and 25 degrees (in radians)
+  for (unsigned int i=delta_start; i < a_start; i++) {
+  	vars_lowerbound[i] = -0.436332;
+	vars_upperbound[i] = 0.436332;
+  }
+
+  // set acceleration bounds to between -1 and 1
+  for (unsigned int i=a_start; i < n_vars; i++) {
+  	vars_lowerbound[i] = -1;
+	vars_upperbound[i] = 1;
+  }
+
+
 
   // Lower and upper limits for the constraints
   // Should be 0 besides initial state.
@@ -76,6 +123,21 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
     constraints_lowerbound[i] = 0;
     constraints_upperbound[i] = 0;
   }
+  
+  // set initial state constraints to initial state
+  constraints_lowerbound[x_start] = x;
+  constraints_lowerbound[y_start] = y;
+  constraints_lowerbound[psi_start] = psi;
+  constraints_lowerbound[v_start] = v;
+  constraints_lowerbound[cte_start] = cte;
+  constraints_lowerbound[epsi_start] = epsi;
+
+  constraints_upperbound[x_start] = x;
+  constraints_upperbound[y_start] = y;
+  constraints_upperbound[psi_start] = psi;
+  constraints_upperbound[v_start] = v;
+  constraints_upperbound[cte_start] = cte;
+  constraints_upperbound[epsi_start] = epsi;
 
   // object that computes objective and constraints
   FG_eval fg_eval(coeffs);
