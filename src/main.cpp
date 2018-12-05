@@ -122,6 +122,14 @@ int main() {
 	  // fit 3rd order polynomial to waypoints
 	  auto coeffs = polyfit(xvals, yvals, 3);
 
+	  // calculate cte and epsi
+	  double cte = py - polyeval(coeffs, px);
+	  double epsi = psi - atan(coeffs[1] + 2*coeffs[2]*px + 3*coeffs[3]*pow(px,2));
+
+	  // create state vector
+	  Eigen::VectorXd state(6);
+	  state << x, y, psi, v, cte, epsi;
+
           double steer_value;
           double throttle_value;
 
