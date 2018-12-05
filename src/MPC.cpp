@@ -1,4 +1,5 @@
 #include "MPC.h"
+#include <float.h>
 #include <cppad/cppad.hpp>
 #include <cppad/ipopt/solve.hpp>
 #include "Eigen-3.3/Eigen/Core"
@@ -159,8 +160,8 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   
   // Non-actuator values can be anything so set the bounds to max values
   for (unsigned int i=0; i < delta_start; i++) {
-  	vars_lowerbound[i] = -1.0e19;
-	vars_upperbound[i] = 1.0e19;
+  	vars_lowerbound[i] = -DBL_MAX;
+	vars_upperbound[i] = DBL_MAX;
   }
 
   // set delta bounds to -25 and 25 degrees (in radians)
