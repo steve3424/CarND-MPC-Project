@@ -22,6 +22,9 @@ double dt = 0;
 // This is the length from front to CoG that has a similar radius.
 const double Lf = 2.67;
 
+// reference velocity to avoid stopping
+ref_v = 40;
+
 // Save indices where each variable starts
 size_t x_start = 0;
 size_t y_start = x_start + N;
@@ -44,6 +47,20 @@ class FG_eval {
     // `fg` a vector of the cost constraints, `vars` is a vector of variable values (state & actuators)
     // NOTE: You'll probably go back and forth between this function and
     // the Solver function below.
+    
+    // COST FUNCTION 
+    // add cte, epsi, and reference velocity (to prevent stopping) 
+    for (int i = 0; i < N; i++) {
+   	fg[0] += CppAD::pow(vars[cte_start + i], 2);
+        fg[0] += CppAD::pow(vars[epsi_start + i], 2);
+	fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2);	
+    }
+
+    // minimize actuator use 
+    for (int i = 0; i < N-1; i++) {
+    	fg[0] += CppAD::pow(vars[delta_start + i], 2);
+	fg[0] += CppAD::pow(vars[a_start + i], 2);
+    }
   }
 };
 
