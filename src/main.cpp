@@ -128,7 +128,7 @@ int main() {
 
 	  // create state vector
 	  Eigen::VectorXd state(6);
-	  state << x, y, psi, v, cte, epsi;
+	  state << px, py, psi, v, cte, epsi;
 
           double steer_value;
           double throttle_value;
