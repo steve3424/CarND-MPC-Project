@@ -4,12 +4,14 @@
 #include <cppad/ipopt/solve.hpp>
 #include "Eigen-3.3/Eigen/Core"
 
+#include <iostream>
+
 using CppAD::AD;
 using namespace std;
 
 // TODO: Set the timestep length and duration
-size_t N = 0;
-double dt = 0;
+size_t N = 25;
+double dt = 0.05;
 
 // This value assumes the model presented in the classroom is used.
 //
@@ -34,7 +36,7 @@ size_t v_start = psi_start + N;
 size_t cte_start = v_start + N;
 size_t epsi_start = cte_start + N;
 size_t delta_start = epsi_start + N;
-size_t a_start = delta_start + N;
+size_t a_start = delta_start + N - 1;
 
 class FG_eval {
  public:
@@ -49,6 +51,7 @@ class FG_eval {
     // NOTE: You'll probably go back and forth between this function and
     // the Solver function below.
     
+
     // COST FUNCTION 
     // add cte, epsi, and reference velocity (to prevent stopping) 
     for (int t = 0; t < N; t++) {
@@ -121,7 +124,6 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   size_t i;
   typedef CPPAD_TESTVECTOR(double) Dvector;
 
-
   // Initial state variables
   double x = state[0];
   double y = state[1];
@@ -129,6 +131,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   double v = state[3];
   double cte = state[4];
   double epsi = state[5];
+
 
   // TODO: Set the number of model variables (includes both states and inputs).
   // For example: If the state is a 4 element vector, the actuators is a 2
@@ -175,8 +178,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   	vars_lowerbound[i] = -1;
 	vars_upperbound[i] = 1;
   }
-
-
+  
 
   // Lower and upper limits for the constraints
   // Should be 0 besides initial state.
@@ -201,6 +203,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   constraints_upperbound[v_start] = v;
   constraints_upperbound[cte_start] = cte;
   constraints_upperbound[epsi_start] = epsi;
+
 
   // object that computes objective and constraints
   FG_eval fg_eval(coeffs);

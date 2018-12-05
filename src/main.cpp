@@ -130,9 +130,11 @@ int main() {
 	  Eigen::VectorXd state(6);
 	  state << px, py, psi, v, cte, epsi;
 
+	  // solve optimization with MPC
 	  auto actuations = mpc.Solve(state, coeffs);
 
-          double steer_value = actuations[0];
+	  // set steer and actuation values to pass to sim
+          double steer_value = actuations[0] / deg2rad(25);
           double throttle_value = actuations[1];
 
 	  json msgJson;
