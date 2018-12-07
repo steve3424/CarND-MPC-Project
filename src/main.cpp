@@ -102,8 +102,10 @@ int main() {
 	  	double x = ptsx[i] - px;
 		double y = ptsy[i] - py;
 
-		xvals[i] = x * cos(-psi) - y * sin(-psi);
-		yvals[i] = x * sin(-psi) + y * cos(-psi);
+		ptsx[i] = x * cos(-psi) - y * sin(-psi);
+		ptsy[i] = x * sin(-psi) + y * cos(-psi);
+		xvals[i] = ptsx[i];
+		yvals[i] = ptsy[i];
 	  }
 
 	  // transform state to vehicle coords
@@ -125,15 +127,12 @@ int main() {
 	  // solve optimization with MPC
 	  auto results = mpc.Solve(state, coeffs);
 
-	  // set steer and actuation values to pass to sim
-          double steer_value = results[0];
-          double throttle_value = results[1];
 
 	  json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
-           msgJson["steering_angle"] = steer_value / deg2rad(25);
-           msgJson["throttle"] = throttle_value;
+           msgJson["steering_angle"] = results[0] / deg2rad(25);
+           msgJson["throttle"] = results[1];
 
           //Display the MPC predicted trajectory 
           vector<double> mpc_x_vals;
@@ -145,15 +144,9 @@ int main() {
           msgJson["mpc_x"] = mpc_x_vals;
           msgJson["mpc_y"] = mpc_y_vals;
 
-          //Display the waypoints/reference line
-          vector<double> next_x_vals = ptsx;
-          vector<double> next_y_vals = ptsy;
-
-          //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
-          // the points in the simulator are connected by a Yellow line
-
-          msgJson["next_x"] = next_x_vals;
-          msgJson["next_y"] = next_y_vals;
+	  // DISPLAY WAYPOINTS IN SIM
+          msgJson["next_x"] = ptsx;
+          msgJson["next_y"] = ptsy;
 
 
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
