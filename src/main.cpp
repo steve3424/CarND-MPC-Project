@@ -92,7 +92,6 @@ int main() {
           double px = j[1]["x"];
           double py = j[1]["y"];
           double psi = j[1]["psi"];
-	  psi *= -1; // this sim requires steering angle to be inverted
           double v = j[1]["speed"];
 
           /*
@@ -103,21 +102,17 @@ int main() {
           */
 
 	  // transform waypoints from map coords to vehicle coords
+	  Eigen::VectorXd xvals(ptsx.size());
+	  Eigen::VectorXd yvals(ptsy.size());
+
 	  for (size_t i = 0; i < ptsx.size(); i++) {
 	  	double x = ptsx[i] - px;
 		double y = ptsy[i] - py;
 
-		ptsx[i] = x * cos(psi) - y * sin(psi);
-		ptsy[i] = x * sin(psi) + y * cos(psi);
+		xvals[i] = x * cos(psi) - y * sin(psi);
+		yvals[i] = x * sin(psi) + y * cos(psi);
 	  }
-
-	  // convert ptsx and ptsy to Eigen::VectorXd types for polyfit()
-	  Eigen::VectorXd xvals(6);
-	  xvals << ptsx[0], ptsx[1], ptsx[2], ptsx[3], ptsx[4], ptsx[5];
-
-	  Eigen::VectorXd yvals(6);
-	  yvals << ptsy[0], ptsy[1], ptsy[2], ptsy[3], ptsy[4], ptsy[5];
-
+	  
 
 	  // fit 3rd order polynomial to waypoints
 	  auto coeffs = polyfit(xvals, yvals, 3);
