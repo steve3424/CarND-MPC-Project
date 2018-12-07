@@ -83,23 +83,16 @@ int main() {
     if (sdata.size() > 2 && sdata[0] == '4' && sdata[1] == '2') {
       string s = hasData(sdata);
       if (s != "") {
-        auto j = j`son::parse(s);
+        auto j = json::parse(s);
         string event = j[0].get<string>();
         if (event == "telemetry") {
           // j[1] is the data JSON object
           vector<double> ptsx = j[1]["ptsx"];
           vector<double> ptsy = j[1]["ptsy"];
-          double px = 0; // set to 0 in vehicle coords
-          double py = 0; // set to 0 in vehicle coords
-          double psi = 0; // set to 0 in vehicle coords
+          double px = j[1]["x"]; 
+          double py = j[1]["y"];
+          double psi = j[1]["psi"];
           double v = j[1]["speed"];
-
-          /*
-          * TODO: Calculate steering angle and throttle using MPC.
-          *
-          * Both are in between [-1, 1].
-          *
-          */
 
 	  // transform waypoints from map coords to vehicle coords
 	  Eigen::VectorXd xvals(ptsx.size());
@@ -109,10 +102,14 @@ int main() {
 	  	double x = ptsx[i] - px;
 		double y = ptsy[i] - py;
 
-		xvals[i] = x * cos(psi) - y * sin(psi);
-		yvals[i] = x * sin(psi) + y * cos(psi);
+		xvals[i] = x * cos(-psi) - y * sin(-psi);
+		yvals[i] = x * sin(-psi) + y * cos(-psi);
 	  }
 
+	  // transform state to vehicle coords
+	  px = 0;
+	  py = 0;
+	  psi = 0;
 
 	  // fit 3rd order polynomial to waypoints
 	  auto coeffs = polyfit(xvals, yvals, 3);
