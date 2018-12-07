@@ -129,17 +129,20 @@ int main() {
 
 
 	  json msgJson;
-          // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
-          // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
-           msgJson["steering_angle"] = results[0] / deg2rad(25);
-           msgJson["throttle"] = results[1];
+
+	  // SEND ACTUATIONS TO VEHICLE
+          msgJson["steering_angle"] = results[0] / deg2rad(25);
+          msgJson["throttle"] = results[1];
 
           //Display the MPC predicted trajectory 
           vector<double> mpc_x_vals;
           vector<double> mpc_y_vals;
 
-          //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
-          // the points in the simulator are connected by a Green line
+	  for (unsigned int i=2; i < results.size(); i+=2) {
+	  	mpc_x_vals.push_back(results[i]);
+		mpc_y_vals.push_back(results[i+1]);
+	  }
+
 
           msgJson["mpc_x"] = mpc_x_vals;
           msgJson["mpc_y"] = mpc_y_vals;
