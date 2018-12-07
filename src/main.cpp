@@ -93,8 +93,10 @@ int main() {
           double py = j[1]["y"];
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
+	  double delta = j[1]["steering_angle"];
+	  double a = j[1]["throttle"];
 
-	  // transform waypoints from map coords to vehicle coords
+	  // transforme waypoints and state vars to vehicle coords 
 	  Eigen::VectorXd xvals(ptsx.size());
 	  Eigen::VectorXd yvals(ptsy.size());
 
@@ -108,7 +110,6 @@ int main() {
 		yvals[i] = ptsy[i];
 	  }
 
-	  // transform state to vehicle coords
 	  px = 0;
 	  py = 0;
 	  psi = 0;
@@ -117,14 +118,23 @@ int main() {
 	  auto coeffs = polyfit(xvals, yvals, 3);
 
 	  // calculate cte and epsi
-	  double cte = py - polyeval(coeffs, px);
+	  double cte = polyeval(coeffs, px) - py;
 	  double epsi = psi - atan(coeffs[1] + 2*coeffs[2]*px + 3*coeffs[3]*pow(px,2));
 
-	  // create state vector
+	  // UPDATE INITIAL STATE WITH 100MS LATENCY
+	  double Lf = 2.67;
+	  double dt = 0.1;
+	  px += v * cos(-delta) * dt;
+	  py += v * sin(-delta) * dt;
+	  psi -= v * delta / Lf * dt;
+	  cte += v * sin(epsi) * dt;
+	  epsi -= v * delta / Lf * dt;
+	  v += a * dt;
+
+	  // run MPC on initial state
 	  Eigen::VectorXd state(6);
 	  state << px, py, psi, v, cte, epsi;
 
-	  // solve optimization with MPC
 	  auto results = mpc.Solve(state, coeffs);
 
 
