@@ -83,15 +83,15 @@ int main() {
     if (sdata.size() > 2 && sdata[0] == '4' && sdata[1] == '2') {
       string s = hasData(sdata);
       if (s != "") {
-        auto j = json::parse(s);
+        auto j = j`son::parse(s);
         string event = j[0].get<string>();
         if (event == "telemetry") {
           // j[1] is the data JSON object
           vector<double> ptsx = j[1]["ptsx"];
           vector<double> ptsy = j[1]["ptsy"];
-          double px = j[1]["x"];
-          double py = j[1]["y"];
-          double psi = j[1]["psi"];
+          double px = 0; // set to 0 in vehicle coords
+          double py = 0; // set to 0 in vehicle coords
+          double psi = 0; // set to 0 in vehicle coords
           double v = j[1]["speed"];
 
           /*
@@ -112,7 +112,7 @@ int main() {
 		xvals[i] = x * cos(psi) - y * sin(psi);
 		yvals[i] = x * sin(psi) + y * cos(psi);
 	  }
-	  
+
 
 	  // fit 3rd order polynomial to waypoints
 	  auto coeffs = polyfit(xvals, yvals, 3);
