@@ -131,18 +131,16 @@ int main() {
 	  epsi -= v * delta / Lf * dt;
 	  v += a * dt;
 
-	  // run MPC on initial state
+	  // run MPC and send actuations to vehicle
 	  Eigen::VectorXd state(6);
 	  state << px, py, psi, v, cte, epsi;
 
 	  auto results = mpc.Solve(state, coeffs);
 
-
 	  json msgJson;
-
-	  // SEND ACTUATIONS TO VEHICLE
-          msgJson["steering_angle"] = results[0] / deg2rad(25);
+          msgJson["steering_angle"] = results[0] / (deg2rad(25) * Lf);
           msgJson["throttle"] = results[1];
+
 
           //Display the MPC predicted trajectory 
           vector<double> mpc_x_vals;
@@ -153,9 +151,9 @@ int main() {
 		mpc_y_vals.push_back(results[i+1]);
 	  }
 
-
           msgJson["mpc_x"] = mpc_x_vals;
           msgJson["mpc_y"] = mpc_y_vals;
+
 
 	  // DISPLAY WAYPOINTS IN SIM
           msgJson["next_x"] = ptsx;

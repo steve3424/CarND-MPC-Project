@@ -9,8 +9,8 @@ using CppAD::AD;
 using namespace std;
 
 // TODO: Set the timestep length and duration
-size_t N = 25;
-double dt = 0.05;
+size_t N = 10;
+double dt = 0.1;
 
 // This value assumes the model presented in the classroom is used.
 //
@@ -25,7 +25,7 @@ double dt = 0.05;
 const double Lf = 2.67;
 
 // reference velocity to avoid stopping
-double ref_v = 40;
+double ref_v = 100;
 
 // Save indices where each variable starts
 size_t x_start = 0;
@@ -54,15 +54,21 @@ class FG_eval {
     // COST FUNCTION 
     // add cte, epsi, and reference velocity (to prevent stopping) 
     for (int t = 0; t < N; t++) {
-   	fg[0] += CppAD::pow(vars[cte_start + t], 2);
-        fg[0] += CppAD::pow(vars[epsi_start + t], 2);
+   	fg[0] += 5000 * CppAD::pow(vars[cte_start + t], 2);
+        fg[0] += 5000 * CppAD::pow(vars[epsi_start + t], 2);
 	fg[0] += CppAD::pow(vars[v_start + t] - ref_v, 2);	
     }
 
     // minimize actuator use 
     for (int t = 0; t < N-1; t++) {
-    	fg[0] += CppAD::pow(vars[delta_start + t], 2);
-	fg[0] += CppAD::pow(vars[a_start + t], 2);
+    	fg[0] += 20 * CppAD::pow(vars[delta_start + t], 2);
+	fg[0] += 20 * CppAD::pow(vars[a_start + t], 2);
+    }
+
+    // smooth successive actuations
+    for (int t = 0; t < N-2; t++) {
+    	fg[0] += CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t],2);
+	fg[0] += CppAD::pow(vars[a_start + t + 1] - vars[a_start + t],2);
     }
 
 
