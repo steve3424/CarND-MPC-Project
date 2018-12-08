@@ -96,7 +96,7 @@ int main() {
 	  double delta = j[1]["steering_angle"];
 	  double a = j[1]["throttle"];
 
-	  // transforme waypoints and state vars to vehicle coords 
+	  // transform waypoints and state vars to vehicle coords 
 	  Eigen::VectorXd xvals(ptsx.size());
 	  Eigen::VectorXd yvals(ptsy.size());
 
@@ -142,6 +142,7 @@ int main() {
           msgJson["throttle"] = results[1];
 
 
+
           //Display the MPC predicted trajectory 
           vector<double> mpc_x_vals;
           vector<double> mpc_y_vals;
@@ -158,7 +159,6 @@ int main() {
 	  // DISPLAY WAYPOINTS IN SIM
           msgJson["next_x"] = ptsx;
           msgJson["next_y"] = ptsy;
-
 
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
