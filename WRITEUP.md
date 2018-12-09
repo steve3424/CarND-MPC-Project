@@ -18,21 +18,21 @@ Now I will go through the MPC code that actually solves the optimization problem
 First I set the 'N' and 'dt' variables which determine how far in the future to predict the path. I settled on the values 'N=10' and 'dt=0.1'. I experimented with roughly 4 different combinations of 'N' and 'dt' values: small N small dt, small N large dt, large N small dt, and large N large dt. I wanted to see what would happen with fairly extreme values and work from there. Here are a few short videos of how these different 'N' and 'dt' values affected the behavior of the vehicle:
 
 N = 2, dt = 0.01
-SMALL-SMALL VIDEO
+![Alt text](images/small-small.jpg?raw=True)
 
 N = 2, dt = 2.0
-SMALL-LARGE VIDEO
+![Alt text](images/small-large.jpg?raw=True)
 
 N = 30, dt = 0.1
-LARGE-SMALL VIDEO
+![Alt text](images/large-small.jpg?raw=True)
 
 N = 30, dt = 3.0
-LARGE-LARGE VIDEO
+![Alt text](images/large-large.jpg?raw=True)
 
 And here is what happened with the final values that I settled on:
 
 N = 10, dt = 0.1
-GOLDILOCKS VIDEO
+![Alt text](images/goldilocks.jpg?raw=True)
 
 I am not entirely sure why these particular 'N' and 'dt' values caused the behavior that they did. I suspect that it has something to do with the cost function, but I will have to experiment further to fully understand why they have the affect that they did. 
 
