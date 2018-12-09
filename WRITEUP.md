@@ -14,4 +14,28 @@ LATENCY IMG
 
 Now I will go through the MPC code that actually solves the optimization problem. This code is found in "MPC.cpp".
 
-First I set the 'N' and 'dt' variables determining the amount of timesteps in the future to project as well as the distance of these timesteps. I settled on the values 'N=10' and 'dt=0.1'. I primarily experimented with the N values. When I went very small, N=2, the vehicle did not move very much. Here is a short video of the results:
+First I set the 'N' and 'dt' variables determining the amount of timesteps in the future to project as well as the distance of these timesteps. I settled on the values 'N=10' and 'dt=0.1'. I experimented with roughly 4 different combinations of 'N' and 'dt' values: small N small dt, small N large dt, large N small dt, and large N large dt. I wanted to see what would happen with fairly extreme values. Here are a few short videos of how these different 'N' and 'dt' values affected the behavior of the vehicle:
+
+N = 2, dt = 0.01
+SMALL-SMALL VIDEO
+
+N = 2, dt = 2.0
+SMALL-LARGE VIDEO
+
+N = 30, dt = 0.1
+LARGE-SMALL VIDEO
+
+N = 30, dt = 3.0
+LARGE-LARGE VIDEO
+
+And here is what happened with the final values that I settled on:
+
+N = 10, dt = 0.1
+GOLDILOCKS VIDEO
+
+I used 3 basic elements in my cost function. First I added the CTE and the EPSI values as well as a reference velocity of 100 to prevent the vehicle from stopping. I increased the multiplicative factor until the vehicle was able to make it around the track. Second I added the actuator values to minimize the use of the actuators. I didn't add too much of a multiplicative factor as I didn't want to penalize the use of actuators too much. Finally I added a penalty for having too big of a difference between successive actuator use. This helped smoothe the projected path.
+
+COST_FUNCTION IMG
+
+
+
